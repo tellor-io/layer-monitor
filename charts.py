@@ -119,7 +119,7 @@ def generate_charts_and_pdf(csv_file, pdf_file):
         ['Metric', 'Mean', 'Median', 'Range', 'Std Dev'],
         ['Block Size (bytes)', block_size_stats['mean'], block_size_stats['median'], block_size_stats['range'], block_size_stats['std']],
         ['Block Time (s)', block_time_stats['mean'], block_time_stats['median'], block_time_stats['range'], block_time_stats['std']],
-        ['Numb Vals', num_validators_stats['mean'], num_validators_stats['median'], num_validators_stats['range'], num_validators_stats['std']],
+        ['Num Vals', num_validators_stats['mean'], num_validators_stats['median'], num_validators_stats['range'], num_validators_stats['std']],
         ['Num Txs', num_txs_stats['mean'], num_txs_stats['median'], num_txs_stats['range'], num_txs_stats['std']]
     ]
     table = Table(data, colWidths=[1.5 * inch, 1.5 * inch, 1.5 * inch, 1.5 * inch, 1.5 * inch])
