@@ -4,6 +4,7 @@ import time
 import os
 import json
 from datetime import datetime
+from dateutil import parser
 
 # desired data:
 # block time
@@ -26,9 +27,10 @@ def get_block_by_height(height):
 
 def get_block_time(block):
     time_string = block["block"]["header"]["time"]
-    dt = datetime.strptime(time_string, "%Y-%m-%dT%H:%M:%S.%fZ")
-    unix_time = dt.timestamp()
-    return unix_time
+    print(time_string)
+    dt = parser.parse(time_string)
+    microseconds = dt.timestamp()
+    return microseconds
 
 def get_block_size(block):
     block_string = json.dumps(block)
@@ -38,13 +40,19 @@ def get_block_data(height):
     block = get_block_by_height(height)
     block_time = get_block_time(block)
     block_size = get_block_size(block)
+    validator_set_size = get_validator_set_size(height)
     return {
         "height": height,
         "block_time": block_time,
         "block_size": block_size,
         "num_txs": len(block["block"]["data"]["txs"]),
-        # "num_validators": len(block["block"]["header"]["validators"])
+        "num_validators": validator_set_size
     }
+
+def get_validator_set_size(height):
+    # http://localhost:26657/validators?height=500&page=1&per_page=100
+    response = requests.get(f"{rpc_endpoint}/validators?height={height}&page=1&per_page=100")
+    return len(response.json()["result"]["validators"])
 
 def main():
     # check for existing data
@@ -63,7 +71,7 @@ def main():
         last_saved_height = 0
         with open(csv_file, "w") as file:
             writer = csv.writer(file)
-            writer.writerow(["height", "block_time", "block_size", "num_txs"])
+            writer.writerow(["height", "block_time", "block_size", "num_txs", "num_validators", "time_since_prev_block"])
 
     latest_height = get_latest_block_height()
     
@@ -71,6 +79,9 @@ def main():
         while latest_height > last_saved_height:
             last_saved_height += 1
             block_data = get_block_data(last_saved_height)
+            # if greater than 1 height, get time diff from previous block
+            if last_saved_height > 1:
+                block_data["time_since_prev_block"] = block_data["block_time"] - get_block_time(get_block_by_height(last_saved_height - 1))
             print(block_data)
             with open(csv_file, "a") as file:
                 writer = csv.DictWriter(file, fieldnames=block_data.keys())
