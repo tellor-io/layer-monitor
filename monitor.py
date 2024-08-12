@@ -13,7 +13,7 @@ from dateutil import parser
 # number of validators
 
 # configs
-rpc_endpoint = "http://localhost:26657"
+rpc_endpoint = "http://tellornode.com:26657/"
 csv_file = "data/chain_data.csv"
 poll_interval = 5 #seconds
 
