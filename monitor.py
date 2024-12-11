@@ -125,8 +125,8 @@ def main():
             block_data_writer = csv.writer(file)
             block_data_writer.writerow(["height", "block_time", "block_size", "num_txs", "num_validators", "time_since_prev_block"])
 
-    if os.path.exists(csv_file):
-        with open(csv_file, "r") as file:
+    if os.path.exists(gas_data_file):
+        with open(gas_data_file, "r") as file:
             reader = csv.reader(file)
             next(reader)
             last_row = None
