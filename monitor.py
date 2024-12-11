@@ -39,9 +39,9 @@ def get_block_size(block):
     return len(block_string)
 
 def ProcessReportsForGasPrices(block_data):
-    txs = block_data.get("result", {}).get("block", {}).get("data", {}).get("txs", [])
+    txs = block_data["block"]["data"]["txs"]
     print(len(txs))
-    height = block_data.get("result", {}).get("block", {}).get("height", {})
+    height = block_data["block"]["height"]
     for tx in txs:
         # Decode Base64 transaction
         decoded_tx = base64.b64decode(tx)
@@ -62,7 +62,7 @@ def ProcessReportsForGasPrices(block_data):
         sender = "unknown"
         code = ""
         try:
-            raw_log = tx_data.get("result", {}).get("tx_result", {})
+            raw_log = tx_data["result"]["tx_result"]
             log_json = json.loads(raw_log)
             code = log_json["code"]
             gas_used = log_json["gas_used"]
