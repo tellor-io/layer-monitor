@@ -41,7 +41,6 @@ def get_block_size(block):
 def ProcessReportsForGasPrices(block_data):
     txs = block_data["block"]["data"]["txs"]
     print(len(txs))
-    print(block_data)
     height = block_data["block"]["header"]["height"]
     for tx in txs:
         # Decode Base64 transaction
@@ -153,7 +152,6 @@ def main():
             # if greater than 1 height, get time diff from previous block
             if last_saved_height > 1:
                 block_data["time_since_prev_block"] = block_data["block_time"] - get_block_time(get_block_by_height(last_saved_height - 1))
-            print(block_data)
             with open(csv_file, "a") as file:
                 block_data_writer = csv.DictWriter(file, fieldnames=block_data.keys())
                 block_data_writer.writerow(block_data)
