@@ -138,7 +138,7 @@ def main():
                 last_saved_height = 837305
     else:
         last_saved_height = 837305
-        with open(csv_file, "w") as file:
+        with open(gas_data_file, "w") as file:
             reports_gas_writer = csv.writer(file)
             reports_gas_writer.writerow(["height", "reporter", "gas_used", "result_code"])
 
