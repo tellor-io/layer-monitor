@@ -52,13 +52,14 @@ def ProcessReportsForGasPrices(block_data):
         # Query the transaction by hash
         tx_url = f"http://54.234.103.186:26657/tx?hash=0x{tx_hash}"
         tx_response = requests.get(tx_url)
-        print(tx_response)
+
 
         if tx_response.status_code != 200:
             print(f"Failed to fetch transaction {tx_hash}: {tx_response.status_code} - {tx_response.text}")
             continue
 
         tx_data = tx_response.json()
+        print(tx_data)
 
         sender = "unknown"
         code = ""
