@@ -118,9 +118,9 @@ def main():
             if last_row:
                 last_saved_height = int(last_row[0])
             else:
-                last_saved_height = 0
+                last_saved_height = 837305
     else:
-        last_saved_height = 0
+        last_saved_height = 837305
         with open(csv_file, "w") as file:
             block_data_writer = csv.writer(file)
             block_data_writer.writerow(["height", "block_time", "block_size", "num_txs", "num_validators", "time_since_prev_block"])
@@ -135,7 +135,7 @@ def main():
             if last_row:
                 last_saved_height = int(last_row[0])
             else:
-                last_saved_height = 0
+                last_saved_height = 837305
     else:
         last_saved_height = 837305
         with open(csv_file, "w") as file:
