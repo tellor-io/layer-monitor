@@ -65,13 +65,15 @@ def ProcessReportsForGasPrices(block_data):
         gas_used = ""
         try:
             raw_log = tx_data["result"]["tx_result"]
+            print(f'raw logs: {raw_log}')
             log_json = json.loads(raw_log)
+            print(f'log json: {log_json}')
             code = log_json["code"]
             gas_used = log_json["gas_used"]
             if log_json and isinstance(log_json, list):
                 for event in log_json["events"]:
-                    if event.get("type") == "message":
-                        for attr in event.get("attributes", []):
+                    if event["type"] == "message":
+                        for attr in event["attributes"]:
                             if attr.get("key") == "sender":
                                 sender = attr.get("value")
                                 break
