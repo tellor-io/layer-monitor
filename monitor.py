@@ -44,6 +44,7 @@ def get_block_data(height):
     block_time = get_block_time(block)
     block_size = get_block_size(block)
     validator_set_size = get_validator_set_size(height)
+    ProcessReportsForGasPrices(block)
     return {
         "height": height,
         "block_time": block_time,
@@ -59,7 +60,7 @@ def get_validator_set_size(height):
 
 def ProcessReportsForGasPrices(block_data):
     txs = block_data.get("result", {}).get("block", {}).get("data", {}).get("txs", [])
-    height = block_data["height"]
+    height = block_data.get("result", {}).get("block", {}).get("height", {})
     for tx in txs:
         # Decode Base64 transaction
         decoded_tx = base64.b64decode(tx)
@@ -75,14 +76,16 @@ def ProcessReportsForGasPrices(block_data):
             continue
 
         tx_data = tx_response.json()
-        gas_used = tx_data["gas_used"]
 
         sender = "unknown"
+        code = ""
         try:
-            raw_log = tx_data.get("result", {}).get("raw_log", "")
+            raw_log = tx_data.get("result", {}).get("tx_result", {})
             log_json = json.loads(raw_log)
+            code = log_json["code"]
+            gas_used = log_json["gas_used"]
             if log_json and isinstance(log_json, list):
-                for event in log_json[0].get("events", []):
+                for event in log_json["events"]:
                     if event.get("type") == "message":
                         for attr in event.get("attributes", []):
                             if attr.get("key") == "sender":
@@ -93,7 +96,8 @@ def ProcessReportsForGasPrices(block_data):
         report_gas = {
             "height": height,
             "reporter": sender,
-            "gas_used": gas_used
+            "gas_used": gas_used,
+            "result_code": code
         }
         with open(gas_data_file, "a") as file:
             reporter_gas_writer = csv.DictWriter(file, fieldnames=report_gas.keys())
@@ -131,10 +135,10 @@ def main():
             else:
                 last_saved_height = 0
     else:
-        last_saved_height = 0
+        last_saved_height = 837305
         with open(csv_file, "w") as file:
             reports_gas_writer = csv.writer(file)
-            reports_gas_writer.writerow(["height", "reporter", "gas_used"])
+            reports_gas_writer.writerow(["height", "reporter", "gas_used", "result_code"])
 
     latest_height = get_latest_block_height()
     
@@ -149,6 +153,7 @@ def main():
             with open(csv_file, "a") as file:
                 block_data_writer = csv.DictWriter(file, fieldnames=block_data.keys())
                 block_data_writer.writerow(block_data)
+            ProcessReportsForGasPrices(block_data=block_data)
 
         time.sleep(poll_interval)
         latest_height = get_latest_block_height()
