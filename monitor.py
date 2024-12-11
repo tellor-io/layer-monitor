@@ -77,8 +77,8 @@ def ProcessReportsForGasPrices(block_data):
                             if attr["key"] == "sender":
                                 sender = attr["value"]
                                 break
-        except (json.JSONDecodeError, KeyError, TypeError):
-            print(f"Could not extract sender for transaction {tx_hash}")
+        except (json.JSONDecodeError, KeyError, TypeError) as err:
+            print(f"Could not extract sender for transaction {tx_hash}: {err}")
         report_gas = {
             "height": height,
             "reporter": sender,
