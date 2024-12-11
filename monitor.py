@@ -27,6 +27,7 @@ def get_latest_block_height():
 
 def get_block_by_height(height):
     response = requests.get(f"{rpc_endpoint}/block?height={height}")
+    print(response.json())
     return response.json()["result"]
 
 def get_block_time(block):
