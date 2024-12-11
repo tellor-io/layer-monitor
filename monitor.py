@@ -41,6 +41,7 @@ def get_block_size(block):
 def ProcessReportsForGasPrices(block_data):
     txs = block_data["block"]["data"]["txs"]
     print(len(txs))
+    print(block_data)
     height = block_data["block"]["height"]
     for tx in txs:
         # Decode Base64 transaction
