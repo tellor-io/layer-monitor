@@ -42,7 +42,7 @@ def ProcessReportsForGasPrices(block_data):
     txs = block_data["block"]["data"]["txs"]
     print(len(txs))
     print(block_data)
-    height = block_data["block"]["height"]
+    height = block_data["block"]["header"]["height"]
     for tx in txs:
         # Decode Base64 transaction
         decoded_tx = base64.b64decode(tx)
