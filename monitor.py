@@ -66,7 +66,7 @@ def ProcessReportsForGasPrices(block_data):
         try:
             raw_log = tx_data["result"]["tx_result"]
             print(f'raw logs: {raw_log}\r')
-            log_json = json.loads(raw_log)
+            log_json = raw_log
             print(f'log json: {log_json}\r')
             code = log_json["code"]
             gas_used = log_json["gas_used"]
