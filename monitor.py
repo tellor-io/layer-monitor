@@ -43,6 +43,7 @@ def ProcessReportsForGasPrices(block_data):
     print(len(txs))
     height = block_data["block"]["header"]["height"]
     for tx in txs:
+        print("proces transaction")
         # Decode Base64 transaction
         decoded_tx = base64.b64decode(tx)
         # Compute SHA-256 hash
@@ -69,7 +70,9 @@ def ProcessReportsForGasPrices(block_data):
             log_json = raw_log
             print(f'log json: {log_json}\r')
             code = log_json["code"]
+            print(f'code: {code}')
             gas_used = log_json["gas_used"]
+            print(f'gas used: {gas_used}')
             if log_json and isinstance(log_json, list):
                 for event in log_json["events"]:
                     if event["type"] == "message":
