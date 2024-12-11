@@ -62,6 +62,7 @@ def ProcessReportsForGasPrices(block_data):
 
         sender = "unknown"
         code = ""
+        gas_used = ""
         try:
             raw_log = tx_data["result"]["tx_result"]
             log_json = json.loads(raw_log)
