@@ -65,17 +65,17 @@ def ProcessReportsForGasPrices(block_data):
         gas_used = ""
         try:
             raw_log = tx_data["result"]["tx_result"]
-            print(f'raw logs: {raw_log}')
+            print(f'raw logs: {raw_log}\r')
             log_json = json.loads(raw_log)
-            print(f'log json: {log_json}')
+            print(f'log json: {log_json}\r')
             code = log_json["code"]
             gas_used = log_json["gas_used"]
             if log_json and isinstance(log_json, list):
                 for event in log_json["events"]:
                     if event["type"] == "message":
                         for attr in event["attributes"]:
-                            if attr.get("key") == "sender":
-                                sender = attr.get("value")
+                            if attr["key"] == "sender":
+                                sender = attr["value"]
                                 break
         except (json.JSONDecodeError, KeyError, TypeError):
             print(f"Could not extract sender for transaction {tx_hash}")
