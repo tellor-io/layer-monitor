@@ -22,17 +22,14 @@ poll_interval = 5 #seconds
 
 def get_latest_block_height():
     response = requests.get(f"{rpc_endpoint}/status")
-    print(response.json())
     return int(response.json()["result"]["sync_info"]["latest_block_height"])
 
 def get_block_by_height(height):
     response = requests.get(f"{rpc_endpoint}/block?height={height}")
-    print(response.json())
     return response.json()["result"]
 
 def get_block_time(block):
     time_string = block["block"]["header"]["time"]
-    print(time_string)
     dt = parser.parse(time_string)
     microseconds = dt.timestamp()
     return microseconds
@@ -41,27 +38,9 @@ def get_block_size(block):
     block_string = json.dumps(block)
     return len(block_string)
 
-def get_block_data(height):
-    block = get_block_by_height(height)
-    block_time = get_block_time(block)
-    block_size = get_block_size(block)
-    validator_set_size = get_validator_set_size(height)
-    ProcessReportsForGasPrices(block)
-    return {
-        "height": height,
-        "block_time": block_time,
-        "block_size": block_size,
-        "num_txs": len(block["block"]["data"]["txs"]),
-        "num_validators": validator_set_size
-    }
-
-def get_validator_set_size(height):
-    # http://localhost:26657/validators?height=500&page=1&per_page=100
-    response = requests.get(f"{rpc_endpoint}/validators?height={height}&page=1&per_page=100")
-    return len(response.json()["result"]["validators"])
-
 def ProcessReportsForGasPrices(block_data):
     txs = block_data.get("result", {}).get("block", {}).get("data", {}).get("txs", [])
+    print(len(txs))
     height = block_data.get("result", {}).get("block", {}).get("height", {})
     for tx in txs:
         # Decode Base64 transaction
@@ -72,6 +51,7 @@ def ProcessReportsForGasPrices(block_data):
         # Query the transaction by hash
         tx_url = f"http://54.234.103.186:26657/tx?hash=0x{tx_hash}"
         tx_response = requests.get(tx_url)
+        print(tx_response)
 
         if tx_response.status_code != 200:
             print(f"Failed to fetch transaction {tx_hash}: {tx_response.status_code} - {tx_response.text}")
@@ -105,6 +85,25 @@ def ProcessReportsForGasPrices(block_data):
             reporter_gas_writer = csv.DictWriter(file, fieldnames=report_gas.keys())
             reporter_gas_writer.writerow(report_gas)
     return 0
+
+def get_block_data(height):
+    block = get_block_by_height(height)
+    block_time = get_block_time(block)
+    block_size = get_block_size(block)
+    validator_set_size = get_validator_set_size(height)
+    ProcessReportsForGasPrices(block)
+    return {
+        "height": height,
+        "block_time": block_time,
+        "block_size": block_size,
+        "num_txs": len(block["block"]["data"]["txs"]),
+        "num_validators": validator_set_size
+    }
+
+def get_validator_set_size(height):
+    # http://localhost:26657/validators?height=500&page=1&per_page=100
+    response = requests.get(f"{rpc_endpoint}/validators?height={height}&page=1&per_page=100")
+    return len(response.json()["result"]["validators"])
 
 def main():
     # check for existing data
@@ -155,7 +154,7 @@ def main():
             with open(csv_file, "a") as file:
                 block_data_writer = csv.DictWriter(file, fieldnames=block_data.keys())
                 block_data_writer.writerow(block_data)
-            ProcessReportsForGasPrices(block_data=block_data)
+            # ProcessReportsForGasPrices(block_data=block_data)
 
         time.sleep(poll_interval)
         latest_height = get_latest_block_height()
