@@ -15,7 +15,7 @@ from dateutil import parser
 # number of validators
 
 # configs
-rpc_endpoint = "http://tellornode.com:26657/"
+rpc_endpoint = "http://tellorlayer.com/rpc"
 csv_file = "data/chain_data.csv"
 gas_data_file = "data/reports_gas_data.csv"
 poll_interval = 5 #seconds
