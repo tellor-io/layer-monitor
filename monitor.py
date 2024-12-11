@@ -22,6 +22,7 @@ poll_interval = 5 #seconds
 
 def get_latest_block_height():
     response = requests.get(f"{rpc_endpoint}/status")
+    print(response.json())
     return int(response.json()["result"]["sync_info"]["latest_block_height"])
 
 def get_block_by_height(height):
