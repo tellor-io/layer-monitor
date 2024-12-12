@@ -40,44 +40,31 @@ def get_block_size(block):
 
 def GetDataFromTx(tx_log, height):
     sender = "unknown"
-    code = ""
-    gas_used = ""
-    isSubmitValue = False
     code = tx_log["code"]
-    print(f'code: {code}\r')
     gas_used = tx_log["gas_used"]
+    isSubmitValue = False
+
     if gas_used == 0:
         return
-    print(f'gas used: {gas_used}\r')
-    if len(tx_log["events"]) > 0:
-        for event in tx_log["events"]:
-            print(f'Event type in array: {event}\r')
-            if event["type"] == "message":
-                print('found "message" type in events')
-                for attr in event["attributes"]:
-                    print(f'Attribute: {attr}')
-                    if attr["key"] == "action":
-                        print(f'found action attr with value: {attr["value"]}')
-                        if attr["value"] != "/layer.oracle.MsgSubmitValue":
-                            isSubmitValue = True
-                    if attr["key"] == "sender":
-                        print(f'found sender: {attr["value"]}')
-                        sender = attr["value"]
-    if not isSubmitValue:
-        return
-    elif sender == "unknown":
-        return
-    else:
-        report_gas = {
-            "height": height,
-            "reporter": sender,
-            "gas_used": gas_used,
-            "result_code": code
-        }
-        print(f'Report gas object: {report_gas}')
-        with open(gas_data_file, "a") as file:
-            reporter_gas_writer = csv.DictWriter(file, fieldnames=report_gas.keys())
-            reporter_gas_writer.writerow(report_gas)
+
+    for event in tx_log["events"]:
+        if event["type"] == "message":
+            for attr in event["attributes"]:
+                if attr["key"] == "action" and attr["value"] == "/layer.oracle.MsgSubmitValue":
+                    isSubmitValue = True
+                if attr["key"] == "sender":
+                    sender = attr["value"]
+
+        if isSubmitValue and sender != "unknown":
+            report_gas = {
+                "height": height,
+                "reporter": sender,
+                "gas_used": gas_used,
+                "result_code": code
+            }
+            with open(gas_data_file, "a") as file:
+                reporter_gas_writer = csv.DictWriter(file, fieldnames=report_gas.keys())
+                reporter_gas_writer.writerow(report_gas)
 
 def ProcessReportsForGasPrices(block_data):
     txs = block_data["block"]["data"]["txs"]
