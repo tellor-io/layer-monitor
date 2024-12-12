@@ -67,6 +67,8 @@ def GetDataFromTx(tx_log, height):
         return
     elif sender == "unknown":
         return
+    elif code == "2":
+        return
     else:
         report_gas = {
             "height": height,
