@@ -81,10 +81,13 @@ def ProcessReportsForGasPrices(block_data):
                         print('found "message" type in events')
                         for attr in event["attributes"]:
                             print(f'Attribute: {attr}')
+                            if attr["key"] == "action":
+                                print(f'found action attr with value: {attr["value"]}')
+                                if attr["value"] != "/layer.oracle.MsgSubmitValue":
+                                    break
                             if attr["key"] == "sender":
                                 print(f'found sender: {attr["value"]}')
                                 sender = attr["value"]
-                                break
             report_gas = {
                 "height": height,
                 "reporter": sender,
@@ -130,9 +133,9 @@ def main():
             if last_row:
                 last_saved_height = int(last_row[0])
             else:
-                last_saved_height = 837305
+                last_saved_height = 872065
     else:
-        last_saved_height = 837305
+        last_saved_height = 872065
         with open(csv_file, "w") as file:
             block_data_writer = csv.writer(file)
             block_data_writer.writerow(["height", "block_time", "block_size", "num_txs", "num_validators", "time_since_prev_block"])
@@ -147,9 +150,9 @@ def main():
             if last_row:
                 last_saved_height = int(last_row[0])
             else:
-                last_saved_height = 837305
+                last_saved_height = 872065
     else:
-        last_saved_height = 837305
+        last_saved_height = 872065
         with open(gas_data_file, "w") as file:
             reports_gas_writer = csv.writer(file)
             reports_gas_writer.writerow(["height", "reporter", "gas_used", "result_code"])
