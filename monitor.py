@@ -91,16 +91,19 @@ def ProcessReportsForGasPrices(block_data):
                                 sender = attr["value"]
             if not isSubmitValue:
                 continue
-            report_gas = {
-                "height": height,
-                "reporter": sender,
-                "gas_used": gas_used,
-                "result_code": code
-            }
-            print(f'Report gas object: {report_gas}')
-            with open(gas_data_file, "a") as file:
-                reporter_gas_writer = csv.DictWriter(file, fieldnames=report_gas.keys())
-                reporter_gas_writer.writerow(report_gas)
+            elif sender == "unknown":
+                continue
+            else:
+                report_gas = {
+                    "height": height,
+                    "reporter": sender,
+                    "gas_used": gas_used,
+                    "result_code": code
+                }
+                print(f'Report gas object: {report_gas}')
+                with open(gas_data_file, "a") as file:
+                    reporter_gas_writer = csv.DictWriter(file, fieldnames=report_gas.keys())
+                    reporter_gas_writer.writerow(report_gas)
         except (json.JSONDecodeError, KeyError, TypeError) as err:
             print(f"Could not extract sender for transaction {tx_hash}: {err}")
     return 0
