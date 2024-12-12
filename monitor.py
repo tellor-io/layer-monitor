@@ -70,14 +70,18 @@ def ProcessReportsForGasPrices(block_data):
             log_json = raw_log
             print(f'log json: {log_json}\r')
             code = log_json["code"]
-            print(f'code: {code}')
+            print(f'code: {code}\r')
             gas_used = log_json["gas_used"]
-            print(f'gas used: {gas_used}')
+            print(f'gas used: {gas_used}\r')
             if log_json and isinstance(log_json, list):
                 for event in log_json["events"]:
+                    print(f'Event type in array: {event}\r')
                     if event["type"] == "message":
+                        print('found "message" type in events')
                         for attr in event["attributes"]:
+                            print(f'Attribute: {attr}')
                             if attr["key"] == "sender":
+                                print(f'found sender: {attr["value"]}')
                                 sender = attr["value"]
                                 break
         except (json.JSONDecodeError, KeyError, TypeError) as err:
