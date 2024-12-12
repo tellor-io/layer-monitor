@@ -38,6 +38,47 @@ def get_block_size(block):
     block_string = json.dumps(block)
     return len(block_string)
 
+def GetDataFromTx(tx_log, height):
+    sender = "unknown"
+    code = ""
+    gas_used = ""
+    isSubmitValue = False
+    code = tx_log["code"]
+    print(f'code: {code}\r')
+    gas_used = tx_log["gas_used"]
+    if gas_used == 0:
+        return
+    print(f'gas used: {gas_used}\r')
+    if len(tx_log["events"]) > 0:
+        for event in tx_log["events"]:
+            print(f'Event type in array: {event}\r')
+            if event["type"] == "message":
+                print('found "message" type in events')
+                for attr in event["attributes"]:
+                    print(f'Attribute: {attr}')
+                    if attr["key"] == "action":
+                        print(f'found action attr with value: {attr["value"]}')
+                        if attr["value"] != "/layer.oracle.MsgSubmitValue":
+                            isSubmitValue = True
+                    if attr["key"] == "sender":
+                        print(f'found sender: {attr["value"]}')
+                        sender = attr["value"]
+    if not isSubmitValue:
+        return
+    elif sender == "unknown":
+        return
+    else:
+        report_gas = {
+            "height": height,
+            "reporter": sender,
+            "gas_used": gas_used,
+            "result_code": code
+        }
+        print(f'Report gas object: {report_gas}')
+        with open(gas_data_file, "a") as file:
+            reporter_gas_writer = csv.DictWriter(file, fieldnames=report_gas.keys())
+            reporter_gas_writer.writerow(report_gas)
+
 def ProcessReportsForGasPrices(block_data):
     txs = block_data["block"]["data"]["txs"]
     print(len(txs))
@@ -61,49 +102,11 @@ def ProcessReportsForGasPrices(block_data):
         tx_data = tx_response.json()
         print(tx_data)
 
-        sender = "unknown"
-        code = ""
-        gas_used = ""
-        isSubmitValue = False
         try:
             raw_log = tx_data["result"]["tx_result"]
             log_json = raw_log
             print(f'log json: {log_json}\r')
-            code = log_json["code"]
-            print(f'code: {code}\r')
-            gas_used = log_json["gas_used"]
-            if gas_used == 0:
-                continue
-            print(f'gas used: {gas_used}\r')
-            if len(log_json["events"]) > 0:
-                for event in log_json["events"]:
-                    print(f'Event type in array: {event}\r')
-                    if event["type"] == "message":
-                        print('found "message" type in events')
-                        for attr in event["attributes"]:
-                            print(f'Attribute: {attr}')
-                            if attr["key"] == "action":
-                                print(f'found action attr with value: {attr["value"]}')
-                                if attr["value"] != "/layer.oracle.MsgSubmitValue":
-                                    isSubmitValue = True
-                            if attr["key"] == "sender":
-                                print(f'found sender: {attr["value"]}')
-                                sender = attr["value"]
-            if not isSubmitValue:
-                continue
-            elif sender == "unknown":
-                continue
-            else:
-                report_gas = {
-                    "height": height,
-                    "reporter": sender,
-                    "gas_used": gas_used,
-                    "result_code": code
-                }
-                print(f'Report gas object: {report_gas}')
-                with open(gas_data_file, "a") as file:
-                    reporter_gas_writer = csv.DictWriter(file, fieldnames=report_gas.keys())
-                    reporter_gas_writer.writerow(report_gas)
+            GetDataFromTx(log_json, height)
         except (json.JSONDecodeError, KeyError, TypeError) as err:
             print(f"Could not extract sender for transaction {tx_hash}: {err}")
     return 0
