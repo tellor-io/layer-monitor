@@ -66,7 +66,6 @@ def ProcessReportsForGasPrices(block_data):
         gas_used = ""
         try:
             raw_log = tx_data["result"]["tx_result"]
-            print(f'raw logs: {raw_log}\r')
             log_json = raw_log
             print(f'log json: {log_json}\r')
             code = log_json["code"]
@@ -92,6 +91,7 @@ def ProcessReportsForGasPrices(block_data):
             "gas_used": gas_used,
             "result_code": code
         }
+        print(f'Report gas object: {report_gas}')
         with open(gas_data_file, "a") as file:
             reporter_gas_writer = csv.DictWriter(file, fieldnames=report_gas.keys())
             reporter_gas_writer.writerow(report_gas)
