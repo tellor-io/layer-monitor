@@ -64,6 +64,7 @@ def ProcessReportsForGasPrices(block_data):
         sender = "unknown"
         code = ""
         gas_used = ""
+        isSubmitValue = False
         try:
             raw_log = tx_data["result"]["tx_result"]
             log_json = raw_log
@@ -84,10 +85,12 @@ def ProcessReportsForGasPrices(block_data):
                             if attr["key"] == "action":
                                 print(f'found action attr with value: {attr["value"]}')
                                 if attr["value"] != "/layer.oracle.MsgSubmitValue":
-                                    break
+                                    isSubmitValue = True
                             if attr["key"] == "sender":
                                 print(f'found sender: {attr["value"]}')
                                 sender = attr["value"]
+            if not isSubmitValue:
+                continue
             report_gas = {
                 "height": height,
                 "reporter": sender,
