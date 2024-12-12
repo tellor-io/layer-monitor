@@ -71,6 +71,8 @@ def ProcessReportsForGasPrices(block_data):
             code = log_json["code"]
             print(f'code: {code}\r')
             gas_used = log_json["gas_used"]
+            if gas_used == 0:
+                continue
             print(f'gas used: {gas_used}\r')
             if len(log_json["events"]) > 0:
                 for event in log_json["events"]:
