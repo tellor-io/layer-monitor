@@ -72,7 +72,7 @@ def ProcessReportsForGasPrices(block_data):
             print(f'code: {code}\r')
             gas_used = log_json["gas_used"]
             print(f'gas used: {gas_used}\r')
-            if log_json and isinstance(log_json, list):
+            if len(log_json["events"]) > 0:
                 for event in log_json["events"]:
                     print(f'Event type in array: {event}\r')
                     if event["type"] == "message":
